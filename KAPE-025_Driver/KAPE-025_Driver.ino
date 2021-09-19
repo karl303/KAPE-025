@@ -25,6 +25,10 @@ void loop() {
     {
       digitalWrite(DATA_OUT_PIN, HIGH);
     }
+    else if(k > 15)
+    {
+      digitalWrite(DATA_OUT_PIN, HIGH);
+    }
     else
     {
       digitalWrite(DATA_OUT_PIN, LOW);
@@ -35,7 +39,7 @@ void loop() {
   }
   digitalWrite(CS_OUT_PIN, HIGH);
   
-  delay(1000);                       // wait for a second
+  delay(2000);                       // wait for a second
   
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
@@ -48,5 +52,5 @@ void loop() {
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
-  delay(1000);                       // wait for a second
+  delay(2000);                       // wait for a second
 }
