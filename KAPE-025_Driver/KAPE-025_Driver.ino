@@ -3,6 +3,8 @@
 #define DATA_OUT_PIN  12
 #define CLK_OUT_PIN   11
 
+int DacCode = 23;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);
@@ -10,6 +12,27 @@ void setup() {
   pinMode(CS_OUT_PIN, OUTPUT);
   pinMode(DATA_OUT_PIN, OUTPUT);
   pinMode(CLK_OUT_PIN, OUTPUT);
+
+  int k = 0;
+  
+  digitalWrite(CS_OUT_PIN, LOW);
+   
+  for(k = 0; k < 24; k++)
+  {
+    if (k > 15)
+    {
+      digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
+    }
+    else
+    {
+      digitalWrite(DATA_OUT_PIN, LOW);  // Set all bits low (keep DC/DC converter off)
+    }
+    
+    digitalWrite(CLK_OUT_PIN, LOW);
+    digitalWrite(CLK_OUT_PIN, HIGH);
+    digitalWrite(CLK_OUT_PIN, LOW);
+  }
+  digitalWrite(CS_OUT_PIN, HIGH);
 }
 
 void loop() {
@@ -25,6 +48,10 @@ void loop() {
     {
       digitalWrite(DATA_OUT_PIN, HIGH);
     }
+    else if(k > 15)
+    {
+      digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
+    }
     else
     {
       digitalWrite(DATA_OUT_PIN, LOW);
@@ -35,7 +62,7 @@ void loop() {
   }
   digitalWrite(CS_OUT_PIN, HIGH);
   
-  delay(1000);                       // wait for a second
+  delay(5000);                       // wait for a second
   
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
@@ -43,10 +70,22 @@ void loop() {
   digitalWrite(DATA_OUT_PIN, LOW);
   for(k = 0; k < 24; k++)
   {
+    if(k == 1)
+    {
+      digitalWrite(DATA_OUT_PIN, LOW);
+    }
+    else if(k > 15)
+    {
+      digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
+    }
+    else
+    {
+      digitalWrite(DATA_OUT_PIN, LOW);
+    }
     digitalWrite(CLK_OUT_PIN, LOW);
     digitalWrite(CLK_OUT_PIN, HIGH);
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
-  delay(1000);                       // wait for a second
+  delay(5000);                       // wait for a second
 }
