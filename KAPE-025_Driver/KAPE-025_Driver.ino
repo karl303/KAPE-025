@@ -4,6 +4,10 @@
 #define CLK_OUT_PIN   11
 
 int DacCode = 23;
+int TempSensorPin = A0;
+
+float TempReadingVoltage = 0.0;
+float TempReadingDegC = 0.0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,10 +37,20 @@ void setup() {
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
+
+  Serial.begin(9600);
+  while(!Serial)
+  {
+    ;
+  }
+  Serial.println("KAPE-025 driver launching.");
 }
 
 void loop() {
   int k = 0;
+  int tempReadingRaw = 0;
+  int n = 0;
+  
   // put your main code here, to run repeatedly:
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
 
@@ -52,11 +66,11 @@ void loop() {
     {
       digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
     }
-    else if(k == 15)
+    else if((k == 15) || (k == 14))
     {
       digitalWrite(DATA_OUT_PIN, HIGH);
     }
-    else if(k == 13)
+    else if((k == 13) || (k == 12))
     {
       digitalWrite(DATA_OUT_PIN, LOW);
     }
@@ -70,7 +84,23 @@ void loop() {
   }
   digitalWrite(CS_OUT_PIN, HIGH);
   
-  delay(5000);                       // wait for a second
+  delay(2500);                       // wait for a second
+
+  for(n = 0; n < 4; n++)
+  {
+    tempReadingRaw = tempReadingRaw + analogRead(TempSensorPin);
+    Serial.print(tempReadingRaw, DEC);
+    Serial.print(",");
+  }
+  Serial.println("");
+  TempReadingVoltage = ((float)tempReadingRaw/(float)4)/((float)1024)*(float)3.3;
+  TempReadingDegC = (TempReadingVoltage - 0.744) / 0.0119;
+  Serial.print(TempReadingVoltage, DEC);
+  Serial.print(", ");
+  Serial.println(TempReadingDegC, DEC);
+  
+  delay(2500);
+
   
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
 
@@ -86,11 +116,11 @@ void loop() {
     {
       digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
     }
-    else if(k == 15)
+    else if((k == 15) || (k == 14))
     {
       digitalWrite(DATA_OUT_PIN, LOW);
     }
-    else if(k == 13)
+    else if((k == 13) || (k == 12))
     {
       digitalWrite(DATA_OUT_PIN, HIGH);
     }
@@ -103,5 +133,21 @@ void loop() {
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
-  delay(5000);                       // wait for a second
+  
+  delay(2500);                       // wait for a second
+  tempReadingRaw = 0;
+  for(n = 0; n < 4; n++)
+  {
+    tempReadingRaw = tempReadingRaw + analogRead(TempSensorPin);
+    Serial.print(tempReadingRaw, DEC);
+    Serial.print(",");
+  }
+  Serial.println("");
+  TempReadingVoltage = ((float)tempReadingRaw/(float)4)/((float)1024)*(float)3.3;
+  TempReadingDegC = (TempReadingVoltage - 0.744) / 0.0119;
+  Serial.print(TempReadingVoltage, DEC);
+  Serial.print(", ");
+  Serial.println(TempReadingDegC, DEC);
+  
+  delay(2500);
 }
