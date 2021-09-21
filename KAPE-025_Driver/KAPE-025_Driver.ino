@@ -52,6 +52,14 @@ void loop() {
     {
       digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
     }
+    else if(k == 15)
+    {
+      digitalWrite(DATA_OUT_PIN, HIGH);
+    }
+    else if(k == 13)
+    {
+      digitalWrite(DATA_OUT_PIN, LOW);
+    }
     else
     {
       digitalWrite(DATA_OUT_PIN, LOW);
@@ -77,6 +85,14 @@ void loop() {
     else if(k > 15)
     {
       digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
+    }
+    else if(k == 15)
+    {
+      digitalWrite(DATA_OUT_PIN, LOW);
+    }
+    else if(k == 13)
+    {
+      digitalWrite(DATA_OUT_PIN, HIGH);
     }
     else
     {
