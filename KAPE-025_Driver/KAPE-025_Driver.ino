@@ -3,7 +3,12 @@
 #define DATA_OUT_PIN  12
 #define CLK_OUT_PIN   11
 
-int DacCode = 23;
+//int DacCode = 23;   // 23/255 * 3.3 V = 0.297 V
+                    // 0.297 V * 2 V/V = 0.595 V
+                    
+int DacCode = 138;  // 138/255 * 3.3 V = 1.785 V
+                    // 1.785 V * 2 V/V = 3.57 V
+                    
 int TempSensorPin = A0;
 
 float TempReadingVoltage = 0.0;
