@@ -51,25 +51,29 @@ void loop() {
 
   if(IterationCount == 0)
   {
-    SensorEnable = 1;
     HeaterControl = 1;
+    DacCode = 138;
   }
   else
   {
-    SensorEnable = SensorEnable << 1;
     HeaterControl = HeaterControl << 1;
+    DacCode = DacCode - 20;
   }
 
   writeSipo();
 
   
-  delay(2500);                       // wait for a second
+  delay(250);                       // wait for a second
 
   //Serial.print("Iteration: ");
   //Serial.print(IterationCount);
   //Serial.print(": ");
+  SensorEnable = 1;
   for (i = 0; i < 6; i++)
   {
+    writeSipo();
+    delay(3);
+    SensorEnable = SensorEnable << 1;
     tempReadingRaw = 0;
     tempReadingSum = 0;
 
@@ -104,6 +108,8 @@ void loop() {
       //Serial.print(tempReadingSum, DEC);
       //Serial.print(",");
     }
+    
+    
     //Serial.println("");
     TempReadingVoltage = ((float)tempReadingSum / (float)4) / ((float)1024) * (float)3.3;
     TempReadingDegC = (TempReadingVoltage - 0.744) / 0.0119;
@@ -120,7 +126,11 @@ void loop() {
     }
 
   }
-  delay(2500);
+  
+  SensorEnable = 0;
+  writeSipo();
+  
+  delay(250);
 
   IterationCount++;
   if (IterationCount == 6)
