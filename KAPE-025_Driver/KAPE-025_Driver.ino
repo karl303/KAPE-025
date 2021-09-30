@@ -9,6 +9,10 @@
 int DacCode = 138;  // 138/255 * 3.3 V = 1.785 V
 // 1.785 V * 2 V/V = 3.57 V
 
+int DcDcRun = 0;
+int SensorEnable = 0;
+int HeaterControl = 0;
+
 int TempSensorPin = A0;
 
 int IterationCount = 0;
@@ -17,6 +21,8 @@ float TempReadingVoltage = 0.0;
 float TempReadingDegC = 0.0;
 
 void setup() {
+  DcDcRun = 0;
+  
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -24,6 +30,9 @@ void setup() {
   pinMode(DATA_OUT_PIN, OUTPUT);
   pinMode(CLK_OUT_PIN, OUTPUT);
 
+  writeSipo();
+
+/*
   int k = 0;
 
   digitalWrite(CS_OUT_PIN, LOW);
@@ -44,13 +53,15 @@ void setup() {
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
-
+*/
   Serial.begin(9600);
   while (!Serial)
   {
     ;
   }
   Serial.println("KAPE-025 driver launching.");
+
+  DcDcRun = 1;
 }
 
 void loop() {
@@ -60,6 +71,19 @@ void loop() {
   int n = 0;
   int i = 0;
 
+  if(IterationCount == 0)
+  {
+    SensorEnable = 1;
+    HeaterControl = 1;
+  }
+  else
+  {
+    SensorEnable = SensorEnable << 1;
+    HeaterControl = HeaterControl << 1;
+  }
+
+  writeSipo();
+  /*
   digitalWrite(CS_OUT_PIN, LOW);  // Drive chip select low
 
   // Loop through bits on the shift register
@@ -107,7 +131,8 @@ void loop() {
     digitalWrite(CLK_OUT_PIN, LOW);
   }
   digitalWrite(CS_OUT_PIN, HIGH);
-
+  */
+  
   delay(2500);                       // wait for a second
 
   //Serial.print("Iteration: ");
@@ -172,4 +197,84 @@ void loop() {
   {
     IterationCount = 0;
   }
+}
+
+void writeSipo()
+{
+  int i = 0;
+  int U4 = 0;
+  int U3 = 0;
+  int U2 = 0;
+
+  for(i = 3; i < 6; i++)
+  {
+    U4 = (U4 << 1) | ((HeaterControl >> i) & 0x1);
+    U4 = (U4 << 1) | ((SensorEnable >> i) & 0x1);
+  }
+  U4 = (U4 << 1) | (DcDcRun & 0x1);
+  U4 = (U4 << 1);
+
+  for(i = 0; i < 3; i++)
+  {
+    U3 = (U3 << 1) | ((HeaterControl >> i) & 0x1);
+    U3 = (U3 << 1) | ((SensorEnable >> i) & 0x1);
+  }
+  U3 = (U3 << 2);
+  
+  /*
+  U4 = (U4 << 1) | ((SensorEnable >> 5) & 0x1);
+  U4 = (U4 << 1) | ((HeaterControl >> 5) & 0x1);
+  U4 = (U4 << 1) | ((SensorEnable >> 4) & 0x1);
+  U4 = (U4 << 1) | ((HeaterControl >> 4) & 0x1);
+  U4 = (U4 << 1) | ((SensorEnable >> 3) & 0x1);
+  U4 = (U4 << 1) | ((HeaterControl >> 3) & 0x1);
+  */
+
+  U2 = reverseBits(DacCode);
+
+  digitalWrite(CS_OUT_PIN, LOW);
+
+  for(i = 0; i < 8; i++)
+  {
+    writeBit(U4);
+    U4 = U4 >> 1;
+  }
+
+  for(i = 0; i < 8; i++)
+  {
+    writeBit(U3);
+    U3 = U3 >> 1;
+  }
+
+  for(i = 0; i < 8; i++)
+  {
+    writeBit(U2);
+    U2 = U2 >> 1;
+  }
+
+  digitalWrite(CS_OUT_PIN, HIGH);
+  
+}
+
+int reverseBits(int inputValue)
+{
+  int temp = inputValue;
+  int reversed = 0;
+  int i = 0;
+
+  for(i = 0; i < 8; i++)
+  {
+    reversed = (reversed << 1) | (temp & 0x1);
+    temp = temp >> 1;
+  }
+  
+  return reversed;
+}
+
+
+void writeBit(int bitValue)
+{
+  digitalWrite(DATA_OUT_PIN, bitValue & 0x1);
+  digitalWrite(CLK_OUT_PIN, HIGH);
+  digitalWrite(CLK_OUT_PIN, LOW);
 }
