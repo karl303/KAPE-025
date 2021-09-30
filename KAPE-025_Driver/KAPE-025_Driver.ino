@@ -32,28 +32,6 @@ void setup() {
 
   writeSipo();
 
-/*
-  int k = 0;
-
-  digitalWrite(CS_OUT_PIN, LOW);
-
-  for (k = 0; k < 24; k++)
-  {
-    if (k > 15)
-    {
-      digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
-    }
-    else
-    {
-      digitalWrite(DATA_OUT_PIN, LOW);  // Set all bits low (keep DC/DC converter off)
-    }
-
-    digitalWrite(CLK_OUT_PIN, LOW);
-    digitalWrite(CLK_OUT_PIN, HIGH);
-    digitalWrite(CLK_OUT_PIN, LOW);
-  }
-  digitalWrite(CS_OUT_PIN, HIGH);
-*/
   Serial.begin(9600);
   while (!Serial)
   {
@@ -83,55 +61,7 @@ void loop() {
   }
 
   writeSipo();
-  /*
-  digitalWrite(CS_OUT_PIN, LOW);  // Drive chip select low
 
-  // Loop through bits on the shift register
-  for (k = 0; k < 24; k++)
-  {
-    if (k == 1) // DC/DC converter run bit
-    {
-      digitalWrite(DATA_OUT_PIN, HIGH);
-    }
-    else if (k > 15) // R-2R DAC section
-    {
-      digitalWrite(DATA_OUT_PIN, (DacCode >> (23 - k)) & 0x1);
-    }
-    else if (((k > 1) && (k < 8)) || ((k > 9) && (k < 16)))
-    {
-      if (IterationCount < 3)
-      {
-        if ((k == (15 - IterationCount * 2)) || (k == (14 - IterationCount * 2) ))
-        {
-          digitalWrite(DATA_OUT_PIN, HIGH);
-        }
-        else
-        {
-          digitalWrite(DATA_OUT_PIN, LOW);
-        }
-      }
-      else
-      {
-        if ((k == (7 - (IterationCount - 3) * 2)) || (k == (6 - (IterationCount - 3) * 2) ))
-        {
-          digitalWrite(DATA_OUT_PIN, HIGH);
-        }
-        else
-        {
-          digitalWrite(DATA_OUT_PIN, LOW);
-        }
-      }
-    }
-    else
-    {
-      digitalWrite(DATA_OUT_PIN, LOW);
-    }
-    digitalWrite(CLK_OUT_PIN, LOW);
-    digitalWrite(CLK_OUT_PIN, HIGH);
-    digitalWrite(CLK_OUT_PIN, LOW);
-  }
-  digitalWrite(CS_OUT_PIN, HIGH);
-  */
   
   delay(2500);                       // wait for a second
 
@@ -220,17 +150,9 @@ void writeSipo()
     U3 = (U3 << 1) | ((SensorEnable >> i) & 0x1);
   }
   U3 = (U3 << 2);
-  
-  /*
-  U4 = (U4 << 1) | ((SensorEnable >> 5) & 0x1);
-  U4 = (U4 << 1) | ((HeaterControl >> 5) & 0x1);
-  U4 = (U4 << 1) | ((SensorEnable >> 4) & 0x1);
-  U4 = (U4 << 1) | ((HeaterControl >> 4) & 0x1);
-  U4 = (U4 << 1) | ((SensorEnable >> 3) & 0x1);
-  U4 = (U4 << 1) | ((HeaterControl >> 3) & 0x1);
-  */
 
   U2 = reverseBits(DacCode);
+
 
   digitalWrite(CS_OUT_PIN, LOW);
 
