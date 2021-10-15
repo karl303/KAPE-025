@@ -57,16 +57,12 @@ void loop() {
 
   writeSipo();
 
-  
-  delay(250);                       // wait for a second
-
-  readPrintAnalog();
-  
-  delay(250);
+  delay(250);         // wait
 
   IterationCount++;
   if (IterationCount == 6)
   {
+    readPrintAnalog();
     IterationCount = 0;
   }
 }
@@ -82,7 +78,7 @@ void readPrintAnalog()
   for (i = 0; i < 6; i++)
   {
     writeSipo();
-    delay(3);
+    delay(5);
     SensorEnable = SensorEnable << 1;
     tempReadingRaw = 0;
     tempReadingSum = 0;
@@ -122,7 +118,7 @@ void readPrintAnalog()
     TempReadingVoltage = ((float)tempReadingSum / (float)4) / ((float)1024) * (float)3.3;
     TempReadingDegC = (TempReadingVoltage - 0.744) / 0.0119;
 
-    Serial.print(TempReadingDegC, 2);
+    Serial.print(TempReadingDegC, 1);
     if (i < 5)
     {
       Serial.print(",");
