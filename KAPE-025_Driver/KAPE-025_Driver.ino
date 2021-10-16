@@ -1,3 +1,9 @@
+// This design uses DueTimer to manage timers.
+//   It was installed via Tools->Manage Libraries...
+//   It is documented on github at:
+//     https://github.com/ivanseidel/DueTimer
+#include <DueTimer.h>
+
 #define CS_OUT_PIN    13
 #define DATA_OUT_PIN  12
 #define CLK_OUT_PIN   11
@@ -39,6 +45,8 @@ void setup() {
   Serial.println("KAPE-025 driver launching.");
 
   DcDcRun = 1;
+
+  Timer3.attachInterrupt(handler).setFrequency(1).start();
 }
 
 void loop() {
@@ -66,11 +74,17 @@ void loop() {
   }
 }
 
+void handler()
+{
+  Serial.println("Timer went off!");
+}
+
 void readPrintAnalog()
 {
   int tempReadingRaw = 0;
   int tempReadingSum = 0;
   int i = 0;
+  int k = 0;
   int n = 0;
 
   SensorEnable = 1;
