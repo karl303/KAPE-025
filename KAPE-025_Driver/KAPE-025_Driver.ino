@@ -54,33 +54,7 @@ void setup() {
 }
 
 void loop() {
-  /*
-  if(IterationCount == 0)
-  {
-    HeaterControl = 1;
-    DacCode = 138;
-  }
-  else
-  {
-    HeaterControl = HeaterControl << 1;
-    DacCode = DacCode - 20;
-  }
-
-  writeSipo();
-
-  delay(250);         // wait
-
-  IterationCount++;
-  if (IterationCount == 6)
-  {
-    readPrintAnalog();
-    IterationCount = 0;
-  }
   
-
-  delay(5000);
-  Serial.println("Main loop iteration.");
-  */
   if(ReadReady == 1)
   {
     readPrintAnalog();
@@ -90,9 +64,6 @@ void loop() {
 
 void handler()
 {
-  
-  //Serial.println("Timer went off!");
-  
   if(IterationCount == 0)
   {
     HeaterControl = 1;
@@ -106,16 +77,12 @@ void handler()
 
   writeSipo();
 
-  //delay(250);         // wait
-
   IterationCount++;
   if (IterationCount == 6)
   {
-    //readPrintAnalog();
     ReadReady = 1;
     IterationCount = 0;
-  }
-  
+  } 
 }
 
 void readPrintAnalog()
