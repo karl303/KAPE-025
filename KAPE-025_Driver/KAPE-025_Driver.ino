@@ -17,6 +17,7 @@ int DacCode = 138;  // 138/255 * 3.3 V = 1.785 V
 int DcDcRun = 0;
 int SensorEnable = 0;
 int HeaterControl = 0;
+int ReadReady = 0;
 
 int TempSensorPin = A0;
 
@@ -27,6 +28,9 @@ float TempReadingDegC = 0.0;
 
 void setup() {
   DcDcRun = 0;
+  SensorEnable = 0;
+  HeaterControl = 0;
+  ReadReady = 0;
   
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);
@@ -46,11 +50,11 @@ void setup() {
 
   DcDcRun = 1;
 
-  Timer3.attachInterrupt(handler).setFrequency(1).start();
+  Timer3.attachInterrupt(handler).setFrequency(4).start();
 }
 
 void loop() {
-
+  /*
   if(IterationCount == 0)
   {
     HeaterControl = 1;
@@ -72,11 +76,46 @@ void loop() {
     readPrintAnalog();
     IterationCount = 0;
   }
+  
+
+  delay(5000);
+  Serial.println("Main loop iteration.");
+  */
+  if(ReadReady == 1)
+  {
+    readPrintAnalog();
+    ReadReady = 0;
+  }
 }
 
 void handler()
 {
-  Serial.println("Timer went off!");
+  
+  //Serial.println("Timer went off!");
+  
+  if(IterationCount == 0)
+  {
+    HeaterControl = 1;
+    DacCode = 138;
+  }
+  else
+  {
+    HeaterControl = HeaterControl << 1;
+    DacCode = DacCode - 20;
+  }
+
+  writeSipo();
+
+  //delay(250);         // wait
+
+  IterationCount++;
+  if (IterationCount == 6)
+  {
+    //readPrintAnalog();
+    ReadReady = 1;
+    IterationCount = 0;
+  }
+  
 }
 
 void readPrintAnalog()
